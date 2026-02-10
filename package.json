@@ -1,0 +1,21 @@
+{
+  "name": "buchungsportal",
+  "version": "1.0.0",
+  "description": "Lokales Buchungsportal für Bioferienhof Loreley GbR",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "build": "cd client && npm run build",
+    "start": "node server/dist/index.js",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install"
+  },
+  "keywords": ["booking", "ferienhof", "ferienhaus"],
+  "author": "Bioferienhof Loreley GbR",
+  "license": "UNLICENSED",
+  "private": true,
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
