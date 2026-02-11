@@ -7,16 +7,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Buchungsportal Farbschema
+        // Buchungsportal Farbschema (weiche Pastelltöne)
         'booking': {
-          DEFAULT: '#22c55e', // Grün für Buchungen
-          light: '#86efac',
-          dark: '#16a34a'
+          DEFAULT: '#6ee7b7', // Sanftes Grün für Buchungen
+          light: '#a7f3d0',
+          dark: '#34d399'
         },
         'reservation': {
-          DEFAULT: '#f97316', // Orange für Reservierungen
-          light: '#fdba74',
-          dark: '#ea580c'
+          DEFAULT: '#fdba74', // Sanftes Orange für Reservierungen
+          light: '#fed7aa',
+          dark: '#fb923c'
         },
         'weekend': {
           DEFAULT: '#f3f4f6', // Hellgrau für Wochenenden/Feiertage
