@@ -32,19 +32,31 @@ body {
 }
 
 /* Formular-Inputs */
-.form-input {
+.form-input,
+.input {
   @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
 }
 
-.form-input:disabled {
+.form-input:disabled,
+.input:disabled {
   @apply bg-gray-100 cursor-not-allowed;
 }
 
-.form-label {
+.select {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white;
+}
+
+.select:disabled {
+  @apply bg-gray-100 cursor-not-allowed;
+}
+
+.form-label,
+.label {
   @apply block text-sm font-medium text-gray-700 mb-1;
 }
 
-.form-error {
+.form-error,
+.error-text {
   @apply text-red-500 text-sm mt-1;
 }
 
