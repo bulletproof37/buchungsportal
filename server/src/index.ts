@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -41,9 +42,9 @@ async function startServer() {
       res.json({ status: 'ok', timestamp: new Date().toISOString() });
     });
 
-    // In Produktion: Statische Dateien des Frontends ausliefern
-    if (process.env.NODE_ENV === 'production') {
-      const clientDistPath = path.join(__dirname, '../../client/dist');
+    // Statische Dateien des Frontends ausliefern (wenn gebaut)
+    const clientDistPath = path.join(__dirname, '../../client/dist');
+    if (fs.existsSync(clientDistPath)) {
       app.use(express.static(clientDistPath));
 
       // Alle anderen Routen zum Frontend weiterleiten (SPA)

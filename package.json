@@ -9,9 +9,15 @@
     "dev:server": "cd server && npm run dev",
     "build": "cd client && npm run build",
     "start": "node server/dist/index.js",
-    "install:all": "npm install && cd client && npm install && cd ../server && npm install"
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "build:server": "cd server && npm run build",
+    "build:all": "npm run build && npm run build:server"
   },
-  "keywords": ["booking", "ferienhof", "ferienhaus"],
+  "keywords": [
+    "booking",
+    "ferienhof",
+    "ferienhaus"
+  ],
   "author": "Bioferienhof Loreley GbR",
   "license": "UNLICENSED",
   "private": true,
