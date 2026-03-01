@@ -10,7 +10,7 @@ echo   Buchungsportal - Bioferienhof Loreley GbR
 echo  =====================================================
 echo.
 
-:: Node.js prüfen
+:: Node.js pruefen
 where node >nul 2>nul
 if %errorlevel% neq 0 (
     echo  FEHLER: Node.js ist nicht installiert!
@@ -22,7 +22,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-:: Node.js Version prüfen (exit code 1 wenn zu neu)
+:: Node.js Version pruefen (exit code 1 wenn zu neu)
 node -e "process.exit(parseInt(process.version.slice(1)) > 21 ? 1 : 0)" >nul 2>&1
 if %errorlevel% equ 1 (
     echo  FEHLER: Node.js Version wird nicht unterstuetzt!
@@ -37,7 +37,7 @@ if %errorlevel% equ 1 (
 
 :: Erste Einrichtung falls node_modules fehlen
 if not exist "node_modules" (
-    echo  Ersteinrichtung wird durchgeführt...
+    echo  Ersteinrichtung wird durchgefuehrt...
     echo  (nur beim ersten Start, ca. 2-3 Minuten)
     echo.
     call npm run install:all
@@ -67,12 +67,12 @@ if not exist "server\dist\index.js" (
     echo  Starte Portal...
 )
 
-:: Browser nach kurzer Verzögerung öffnen
+:: Browser nach kurzer Verzoegerung oeffnen
 start "" powershell -windowstyle hidden -command "Start-Sleep 2; Start-Process 'http://localhost:3001'"
 
 :: Server starten
 echo.
-echo  Portal läuft unter: http://localhost:3001
+echo  Portal laeuft unter: http://localhost:3001
 echo.
 echo  Dieses Fenster offen lassen.
 echo  Schliessen beendet den Server.

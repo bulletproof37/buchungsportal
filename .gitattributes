@@ -1,0 +1,18 @@
+# Windows Batch-Dateien immer mit CRLF auschecken
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Quellcode mit LF
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.md text eol=lf
+
+# Binaerdateien
+*.db binary
+*.png binary
+*.jpg binary
+*.ico binary
