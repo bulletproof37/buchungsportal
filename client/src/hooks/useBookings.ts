@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Booking, BookingInput, ApiResponse } from '../types';
 import { API, ERRORS } from '../utils/constants';
+import { toISODateString } from '../utils/dateUtils';
 
 interface UseBookingsResult {
   bookings: Booking[];
@@ -161,7 +162,7 @@ export function getBookingForDate(
   date: Date,
   houseId: number
 ): { arrival: Booking | null; departure: Booking | null; staying: Booking | null } {
-  const dateStr = date.toISOString().split('T')[0];
+  const dateStr = toISODateString(date);
   const houseBookings = filterBookingsByHouse(bookings, houseId);
 
   let arrival: Booking | null = null;

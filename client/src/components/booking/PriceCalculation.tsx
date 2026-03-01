@@ -92,6 +92,12 @@ export default function PriceCalculation({
           <span>{LABELS.TOTAL_PRICE}</span>
           <span className="text-blue-700">{formatPrice(calculation.totalPrice)}</span>
         </div>
+
+        {/* MwSt.-Hinweis */}
+        <div className="flex justify-between text-xs text-gray-500 mt-1">
+          <span>davon MwSt. 7 %</span>
+          <span>{formatPrice(calculation.totalPrice * 7 / 107)}</span>
+        </div>
       </div>
     </div>
   );

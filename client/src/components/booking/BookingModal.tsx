@@ -89,7 +89,16 @@ export default function BookingModal({
   }, [isOpen, booking, preselectedHouseId, preselectedDate, houses]);
 
   const handleFieldChange = useCallback((field: keyof BookingInput, value: string | number) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => {
+      const updated = { ...prev, [field]: value };
+      // Wenn check_in gesetzt wird und check_out noch leer: automatisch auf +2 Tage
+      if (field === 'check_in' && typeof value === 'string' && value && !prev.check_out) {
+        const [y, m, d] = value.split('-').map(Number);
+        const checkOut = new Date(y, m - 1, d + 2);
+        updated.check_out = toISODateString(checkOut);
+      }
+      return updated;
+    });
     // Fehler für dieses Feld löschen
     setErrors(prev => prev.filter(e => e.field !== field));
   }, []);
@@ -114,9 +123,9 @@ export default function BookingModal({
       check_in: formData.check_in!,
       check_out: formData.check_out!,
       guest_last_name: formData.guest_last_name!.trim(),
-      guest_first_name: formData.guest_first_name!.trim(),
+      guest_first_name: formData.guest_first_name?.trim() || '',
       guest_email: formData.guest_email?.trim() || undefined,
-      guest_phone: formData.guest_phone!.trim(),
+      guest_phone: formData.guest_phone?.trim() || '',
       guest_street: formData.guest_street?.trim() || undefined,
       guest_zip: formData.guest_zip?.trim() || undefined,
       guest_city: formData.guest_city?.trim() || undefined,

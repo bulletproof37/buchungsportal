@@ -22,8 +22,8 @@ export default function DayNumbers({ year, dayWidth }: DayNumbersProps) {
         return (
           <div
             key={index}
-            className={`flex-shrink-0 text-center text-xs flex items-center justify-center border-r ${
-              isFirstOfMonth ? 'border-r-gray-400' : 'border-r-gray-200'
+            className={`flex-shrink-0 text-center text-xs flex items-center justify-center border-r border-r-gray-200 ${
+              isFirstOfMonth ? 'border-l border-l-gray-400' : ''
             } ${isSpecialDay ? 'bg-weekend text-gray-500' : 'text-gray-600'}`}
             style={{ width: dayWidth, minWidth: dayWidth }}
           >

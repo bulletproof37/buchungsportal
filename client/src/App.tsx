@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import Layout from './components/layout/Layout'
 import YearTimeline from './components/timeline/YearTimeline'
 import BookingModal from './components/booking/BookingModal'
+import BookingList from './components/booking/BookingList'
 import { useHouses } from './hooks/useHouses'
 import { useBookings } from './hooks/useBookings'
 import { useSettings } from './hooks/useSettings'
@@ -24,11 +25,16 @@ export function useBookingModal() {
   return context;
 }
 
-function Dashboard() {
-  const currentYear = new Date().getFullYear();
-  const [year, setYear] = useState(currentYear);
-  const { houses, loading: housesLoading, error: housesError } = useHouses();
-  const { bookings, loading: bookingsLoading, error: bookingsError } = useBookings(year);
+interface DashboardProps {
+  houses: House[];
+  bookings: Booking[];
+  year: number;
+  onYearChange: (year: number) => void;
+  loading: boolean;
+  error: string | null;
+}
+
+function Dashboard({ houses, bookings, year, onYearChange, loading, error }: DashboardProps) {
   const { openNewBooking, openEditBooking } = useBookingModal();
 
   const handleDayClick = useCallback((house: House, date: Date) => {
@@ -39,27 +45,34 @@ function Dashboard() {
     openEditBooking(booking);
   }, [openEditBooking]);
 
-  if (housesError || bookingsError) {
+  if (error) {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
           <p className="text-red-500 font-medium">Fehler beim Laden der Daten</p>
-          <p className="text-gray-500 text-sm mt-1">{housesError || bookingsError}</p>
+          <p className="text-gray-500 text-sm mt-1">{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-[calc(100vh-64px)]">
-      <YearTimeline
-        houses={houses}
+    <div className="flex flex-col h-[calc(100vh-64px)]">
+      <div className="flex-1 min-h-0">
+        <YearTimeline
+          houses={houses}
+          bookings={bookings}
+          year={year}
+          onYearChange={onYearChange}
+          onDayClick={handleDayClick}
+          onBookingClick={handleBookingClick}
+          loading={loading}
+        />
+      </div>
+      <BookingList
         bookings={bookings}
-        year={year}
-        onYearChange={setYear}
-        onDayClick={handleDayClick}
+        houses={houses}
         onBookingClick={handleBookingClick}
-        loading={housesLoading || bookingsLoading}
       />
     </div>
   );
@@ -90,13 +103,13 @@ function App() {
   const [preselectedHouseId, setPreselectedHouseId] = useState<number | undefined>();
   const [preselectedDate, setPreselectedDate] = useState<Date | undefined>();
 
-  // Jahr für Buchungen (Standardmäßig aktuelles Jahr)
+  // Jahr für Zeitstrahl und Buchungen (gemeinsam)
   const currentYear = new Date().getFullYear();
-  const [bookingsYear, setBookingsYear] = useState(currentYear);
+  const [year, setYear] = useState(currentYear);
 
   // Hooks
-  const { houses } = useHouses();
-  const { bookings, createBooking, updateBooking, deleteBooking } = useBookings(bookingsYear);
+  const { houses, loading: housesLoading, error: housesError } = useHouses();
+  const { bookings, loading: bookingsLoading, error: bookingsError, createBooking, updateBooking, deleteBooking } = useBookings(year);
   const { settings } = useSettings();
 
   // Modal öffnen für neue Buchung
@@ -129,12 +142,12 @@ function App() {
     if (result) {
       // Jahr aktualisieren falls nötig
       const checkInYear = new Date(data.check_in).getFullYear();
-      if (checkInYear !== bookingsYear) {
-        setBookingsYear(checkInYear);
+      if (checkInYear !== year) {
+        setYear(checkInYear);
       }
     }
     return result;
-  }, [createBooking, bookingsYear]);
+  }, [createBooking, year]);
 
   // Buchung aktualisieren
   const handleUpdate = useCallback(async (id: number, data: BookingInput): Promise<Booking | null> => {
@@ -155,7 +168,16 @@ function App() {
     <BookingModalContext.Provider value={modalContext}>
       <Layout onNewBooking={() => openNewBooking()}>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={
+            <Dashboard
+              houses={houses}
+              bookings={bookings}
+              year={year}
+              onYearChange={setYear}
+              loading={housesLoading || bookingsLoading}
+              error={housesError || bookingsError}
+            />
+          } />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/statistics" element={<StatisticsPage />} />
         </Routes>

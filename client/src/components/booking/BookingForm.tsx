@@ -144,7 +144,7 @@ export default function BookingForm({
       {/* Gastdaten */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="label">{LABELS.GUEST_FIRST_NAME} *</label>
+          <label className="label">{LABELS.GUEST_FIRST_NAME}</label>
           <input
             type="text"
             value={formData.guest_first_name || ''}
@@ -174,7 +174,7 @@ export default function BookingForm({
       </div>
 
       <div>
-        <label className="label">{LABELS.GUEST_PHONE} *</label>
+        <label className="label">{LABELS.GUEST_PHONE}</label>
         <input
           type="tel"
           value={formData.guest_phone || ''}

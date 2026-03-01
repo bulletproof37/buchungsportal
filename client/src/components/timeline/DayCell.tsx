@@ -15,9 +15,9 @@ export default function DayCell({ date, dayWidth, onDayClick }: DayCellProps) {
   const dayOfMonth = date.getDate();
   const isFirstOfMonth = dayOfMonth === 1;
 
-  const baseClass = 'h-full border-r flex';
+  const baseClass = 'h-full border-r border-r-gray-200 flex';
   const bgClass = isSpecialDay ? 'bg-weekend' : 'bg-white';
-  const borderClass = isFirstOfMonth ? 'border-r-gray-400' : 'border-r-gray-200';
+  const borderClass = isFirstOfMonth ? 'border-l border-l-gray-400' : '';
 
   const handleClick = (half: 'morning' | 'afternoon') => (e: React.MouseEvent) => {
     e.stopPropagation();

@@ -14,9 +14,9 @@ export default {
           dark: '#34d399'
         },
         'reservation': {
-          DEFAULT: '#fdba74', // Sanftes Orange für Reservierungen
-          light: '#fed7aa',
-          dark: '#fb923c'
+          DEFAULT: '#93c5fd', // Sanftes Blau für Reservierungen
+          light: '#bfdbfe',
+          dark: '#3b82f6'
         },
         'weekend': {
           DEFAULT: '#f3f4f6', // Hellgrau für Wochenenden/Feiertage

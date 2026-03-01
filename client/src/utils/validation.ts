@@ -30,14 +30,6 @@ export function validateBooking(
     errors.push({ field: 'guest_last_name', message: ERRORS.REQUIRED_FIELD });
   }
 
-  if (!input.guest_first_name?.trim()) {
-    errors.push({ field: 'guest_first_name', message: ERRORS.REQUIRED_FIELD });
-  }
-
-  if (!input.guest_phone?.trim()) {
-    errors.push({ field: 'guest_phone', message: ERRORS.REQUIRED_FIELD });
-  }
-
   if (!input.status) {
     errors.push({ field: 'status', message: ERRORS.REQUIRED_FIELD });
   }
