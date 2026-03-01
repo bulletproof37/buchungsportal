@@ -18,10 +18,10 @@ echo  [%date% %time%] Update gestartet.
 
 cd /d "%~dp0"
 
-:: Node.js Version prüfen
-for /f "tokens=1 delims=." %%V in ('node -e "process.stdout.write(process.version.slice(1))"') do set NODE_MAJOR=%%V
-if %NODE_MAJOR% GTR 21 (
-    echo  FEHLER: Node.js v%NODE_MAJOR% wird nicht unterstuetzt!
+:: Node.js Version prüfen (exit code 1 wenn zu neu)
+node -e "process.exit(parseInt(process.version.slice(1)) > 21 ? 1 : 0)" >nul 2>&1
+if %errorlevel% equ 1 (
+    echo  FEHLER: Node.js Version wird nicht unterstuetzt!
     echo  Benoetigt: Version 18 oder 20 LTS
     echo  Download: https://nodejs.org  ^(LTS-Schaltflaeche^)
     if %SILENT%==0 ( echo. & pause )
