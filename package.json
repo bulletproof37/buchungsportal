@@ -23,5 +23,8 @@
   "private": true,
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "optionalDependencies": {
+    "node-windows": "^1.0.0"
   }
 }

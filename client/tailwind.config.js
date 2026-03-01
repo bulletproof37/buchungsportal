@@ -20,6 +20,11 @@ export default {
         },
         'weekend': {
           DEFAULT: '#f3f4f6', // Hellgrau für Wochenenden/Feiertage
+        },
+        'block-period': {
+          DEFAULT: '#fca5a5', // Pastel Rot für Sperrzeiten
+          light: '#fecaca',
+          dark: '#f87171'
         }
       }
     },

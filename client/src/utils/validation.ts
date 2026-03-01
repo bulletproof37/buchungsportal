@@ -1,4 +1,4 @@
-import { BookingInput, ValidationError, Booking } from '../types';
+import { BookingInput, ValidationError, Booking, Block } from '../types';
 import { ERRORS, DEFAULTS } from './constants';
 import { calculateNights, doPeriodsOverlap } from './dateUtils';
 
@@ -9,7 +9,8 @@ export function validateBooking(
   input: Partial<BookingInput>,
   existingBookings: Booking[],
   editingBookingId?: number,
-  minNights: number = DEFAULTS.MIN_NIGHTS
+  minNights: number = DEFAULTS.MIN_NIGHTS,
+  blocks: Block[] = []
 ): ValidationError[] {
   const errors: ValidationError[] = [];
 
@@ -72,6 +73,18 @@ export function validateBooking(
 
       if (overlappingBooking) {
         errors.push({ field: 'check_in', message: ERRORS.OVERLAP });
+      }
+
+      // Sperrzeit-Überschneidung prüfen
+      const overlappingBlock = blocks.find(block => {
+        if (block.house_id !== input.house_id) return false;
+        // Buchung überschneidet Sperrzeit wenn: check_in < date_to UND check_out > date_from
+        return input.check_in! < block.date_to && input.check_out! > block.date_from;
+      });
+
+      if (overlappingBlock) {
+        const desc = overlappingBlock.description ? ` (${overlappingBlock.description})` : '';
+        errors.push({ field: 'check_in', message: `Der Zeitraum ist für dieses Haus gesperrt${desc}.` });
       }
     }
   }

@@ -2,14 +2,13 @@
 chcp 65001 >nul
 title Buchungsportal - Bioferienhof Loreley GbR
 
+cd /d "%~dp0"
+
 echo.
 echo  =====================================================
 echo   Buchungsportal - Bioferienhof Loreley GbR
 echo  =====================================================
 echo.
-
-:: Zum Verzeichnis dieser Datei wechseln
-cd /d "%~dp0"
 
 :: Node.js prüfen
 where node >nul 2>nul
@@ -25,8 +24,8 @@ if %errorlevel% neq 0 (
 
 :: Erste Einrichtung falls node_modules fehlen
 if not exist "node_modules" (
-    echo  Ersteinrichtung wird durchgefuehrt...
-    echo  ^(nur beim ersten Start, ca. 2-3 Minuten^)
+    echo  Ersteinrichtung wird durchgeführt...
+    echo  (nur beim ersten Start, ca. 2-3 Minuten)
     echo.
     call npm run install:all
     if %errorlevel% neq 0 (
@@ -38,23 +37,32 @@ if not exist "node_modules" (
     echo.
 )
 
-:: Anwendung bauen
-echo  Bereite Anwendung vor...
-call npm run build:all
-if %errorlevel% neq 0 (
+:: Bauen nur wenn noch kein Build vorhanden
+if not exist "server\dist\index.js" (
+    echo  Kein Build gefunden. Erstelle Anwendung...
+    echo  (einmalig, ca. 1-2 Minuten)
     echo.
-    echo  FEHLER: Build fehlgeschlagen!
-    pause
-    exit /b 1
+    call npm run build:all
+    if %errorlevel% neq 0 (
+        echo.
+        echo  FEHLER: Build fehlgeschlagen!
+        pause
+        exit /b 1
+    )
+    echo.
+) else (
+    echo  Starte Portal...
 )
 
-:: Browser nach kurzer Verzögerung öffnen (PowerShell Timer)
-start "" powershell -windowstyle hidden -command "Start-Sleep 3; Start-Process 'http://localhost:3001'"
+:: Browser nach kurzer Verzögerung öffnen
+start "" powershell -windowstyle hidden -command "Start-Sleep 2; Start-Process 'http://localhost:3001'"
 
-:: Server starten (Fenster bleibt offen)
+:: Server starten
 echo.
-echo  Portal laeuft unter: http://localhost:3001
-echo  Dieses Fenster offen lassen - Schliessen beendet den Server.
+echo  Portal läuft unter: http://localhost:3001
+echo.
+echo  Dieses Fenster offen lassen.
+echo  Schliessen beendet den Server.
 echo.
 node server/dist/index.js
 

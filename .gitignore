@@ -7,10 +7,10 @@ dist/
 build/
 *.tsbuildinfo
 
-# Database (backup separately!)
+# Database & Daten (lokal, nicht ins Repo)
 *.db
 *.db-journal
-server/data/*.db
+server/data/
 
 # Environment files
 .env

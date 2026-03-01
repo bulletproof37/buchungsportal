@@ -93,6 +93,23 @@ export interface Statistics {
   };
 }
 
+// Sperrzeit
+export interface Block {
+  id: number;
+  house_id: number;
+  date_from: string; // ISO date (erster gesperrter Tag)
+  date_to: string;   // ISO date (Tag NACH dem letzten gesperrten Tag, exklusiv)
+  description: string;
+  created_at: string;
+}
+
+export interface BlockInput {
+  house_id: number;
+  date_from: string;
+  date_to: string;
+  description: string;
+}
+
 // Validierungsfehler
 export interface ValidationError {
   field: string;

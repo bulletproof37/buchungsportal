@@ -7,6 +7,7 @@ interface UseSettingsResult {
   loading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
+  updateSettings: (data: Partial<Settings>) => Promise<boolean>;
 }
 
 const defaultSettings: Settings = {
@@ -54,6 +55,26 @@ export function useSettings(): UseSettingsResult {
     }
   }, []);
 
+  const updateSettings = useCallback(async (data: Partial<Settings>): Promise<boolean> => {
+    try {
+      const response = await fetch(API.SETTINGS, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error(ERRORS.SAVE_ERROR);
+      const result: ApiResponse<Settings> = await response.json();
+      if (result.success && result.data) {
+        setSettings(result.data);
+        return true;
+      }
+      return false;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : ERRORS.NETWORK_ERROR);
+      return false;
+    }
+  }, []);
+
   useEffect(() => {
     fetchSettings();
   }, [fetchSettings]);
@@ -62,6 +83,7 @@ export function useSettings(): UseSettingsResult {
     settings,
     loading,
     error,
-    refetch: fetchSettings
+    refetch: fetchSettings,
+    updateSettings
   };
 }

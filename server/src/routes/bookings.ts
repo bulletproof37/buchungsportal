@@ -189,8 +189,9 @@ router.get('/:id/pdf', (req, res) => {
     const pageW = doc.page.width - 110; // nutzbare Breite
 
     // ── Titel ganz oben ────────────────────────────────────────────
+    const titleLabel = booking.status === 'booking' ? 'Buchungsbestätigung' : 'Reservierungsbestätigung';
     doc.fontSize(20).font('Helvetica-Bold')
-      .text('Buchungsbestätigung', { align: 'center' });
+      .text(titleLabel, { align: 'center' });
     doc.fontSize(11).font('Helvetica')
       .text(`#${booking.id}  ·  ${statusLabel}`, { align: 'center' });
 
@@ -307,8 +308,21 @@ router.get('/:id/pdf', (req, res) => {
     doc.moveTo(55, doc.y).lineTo(55 + pageW, doc.y).strokeColor('#cccccc').stroke();
     doc.moveDown(1);
 
+    if (booking.status === 'reservation') {
+      doc.fontSize(10).font('Helvetica')
+        .text('Wir bitten um eine Anzahlung von 100 € auf folgendes Konto unter Angabe von Anzahlung, Hausname, Zeitraum und Name:');
+    } else {
+      doc.fontSize(10).font('Helvetica')
+        .text('Wir bitten um Überweisung der Restzahlung bis spätestens 4 Wochen vor Anreise auf folgendes Konto:');
+    }
+
+    doc.moveDown(0.6);
+    doc.fontSize(10).font('Helvetica-Bold').text('Bankverbindung:');
+    doc.moveDown(0.3);
     doc.fontSize(10).font('Helvetica')
-      .text('Wir bitten um Überweisung der Restzahlung bis spätestens 4 Wochen vor Anreise.');
+      .text('Svenja Stefanie Mareen Bahl');
+    doc.text('IBAN: DE04 1001 1001 2758 3417 94');
+    doc.text('BIC: NTSBDEB1XXX  ·  N26 Bank');
 
     doc.moveDown(0.8);
     doc.fontSize(10).font('Helvetica-Bold').text('Vor Ort ist zusätzlich zu entrichten:');

@@ -4,15 +4,21 @@ import Layout from './components/layout/Layout'
 import YearTimeline from './components/timeline/YearTimeline'
 import BookingModal from './components/booking/BookingModal'
 import BookingList from './components/booking/BookingList'
+import BlockModal from './components/block/BlockModal'
+import SettingsPage from './components/settings/SettingsPage'
+import StatisticsPage from './components/statistics/StatisticsPage'
 import { useHouses } from './hooks/useHouses'
 import { useBookings } from './hooks/useBookings'
 import { useSettings } from './hooks/useSettings'
-import { House, Booking, BookingInput } from './types'
+import { useBlocks } from './hooks/useBlocks'
+import { House, Booking, BookingInput, Block, BlockInput } from './types'
 
 // Context für Modal-Steuerung
 interface BookingModalContextType {
   openNewBooking: (houseId?: number, date?: Date) => void;
   openEditBooking: (booking: Booking) => void;
+  openNewBlock: (houseId?: number, date?: Date) => void;
+  openEditBlock: (block: Block) => void;
 }
 
 const BookingModalContext = createContext<BookingModalContextType | null>(null);
@@ -28,14 +34,15 @@ export function useBookingModal() {
 interface DashboardProps {
   houses: House[];
   bookings: Booking[];
+  blocks: Block[];
   year: number;
   onYearChange: (year: number) => void;
   loading: boolean;
   error: string | null;
 }
 
-function Dashboard({ houses, bookings, year, onYearChange, loading, error }: DashboardProps) {
-  const { openNewBooking, openEditBooking } = useBookingModal();
+function Dashboard({ houses, bookings, blocks, year, onYearChange, loading, error }: DashboardProps) {
+  const { openNewBooking, openEditBooking, openEditBlock } = useBookingModal();
 
   const handleDayClick = useCallback((house: House, date: Date) => {
     openNewBooking(house.id, date);
@@ -44,6 +51,10 @@ function Dashboard({ houses, bookings, year, onYearChange, loading, error }: Das
   const handleBookingClick = useCallback((booking: Booking) => {
     openEditBooking(booking);
   }, [openEditBooking]);
+
+  const handleBlockClick = useCallback((block: Block) => {
+    openEditBlock(block);
+  }, [openEditBlock]);
 
   if (error) {
     return (
@@ -62,10 +73,12 @@ function Dashboard({ houses, bookings, year, onYearChange, loading, error }: Das
         <YearTimeline
           houses={houses}
           bookings={bookings}
+          blocks={blocks}
           year={year}
           onYearChange={onYearChange}
           onDayClick={handleDayClick}
           onBookingClick={handleBookingClick}
+          onBlockClick={handleBlockClick}
           loading={loading}
         />
       </div>
@@ -78,30 +91,17 @@ function Dashboard({ houses, bookings, year, onYearChange, loading, error }: Das
   );
 }
 
-function SettingsPage() {
-  return (
-    <div className="p-4">
-      <h2 className="text-xl font-semibold mb-4">Einstellungen</h2>
-      <p className="text-gray-500">Einstellungen werden in Phase 4 implementiert...</p>
-    </div>
-  )
-}
-
-function StatisticsPage() {
-  return (
-    <div className="p-4">
-      <h2 className="text-xl font-semibold mb-4">Statistik</h2>
-      <p className="text-gray-500">Statistik wird in Phase 5 implementiert...</p>
-    </div>
-  )
-}
 
 function App() {
-  // Modal State
+  // Buchungs-Modal State
   const [modalOpen, setModalOpen] = useState(false);
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
   const [preselectedHouseId, setPreselectedHouseId] = useState<number | undefined>();
   const [preselectedDate, setPreselectedDate] = useState<Date | undefined>();
+
+  // Sperr-Modal State (für Bearbeiten bestehender Sperrzeiten)
+  const [blockModalOpen, setBlockModalOpen] = useState(false);
+  const [editingBlock, setEditingBlock] = useState<Block | null>(null);
 
   // Jahr für Zeitstrahl und Buchungen (gemeinsam)
   const currentYear = new Date().getFullYear();
@@ -111,8 +111,9 @@ function App() {
   const { houses, loading: housesLoading, error: housesError } = useHouses();
   const { bookings, loading: bookingsLoading, error: bookingsError, createBooking, updateBooking, deleteBooking } = useBookings(year);
   const { settings } = useSettings();
+  const { blocks, createBlock, updateBlock, deleteBlock } = useBlocks(year);
 
-  // Modal öffnen für neue Buchung
+  // Buchungs-Modal öffnen
   const openNewBooking = useCallback((houseId?: number, date?: Date) => {
     setEditingBooking(null);
     setPreselectedHouseId(houseId);
@@ -120,7 +121,6 @@ function App() {
     setModalOpen(true);
   }, []);
 
-  // Modal öffnen für bestehende Buchung
   const openEditBooking = useCallback((booking: Booking) => {
     setEditingBooking(booking);
     setPreselectedHouseId(undefined);
@@ -128,7 +128,6 @@ function App() {
     setModalOpen(true);
   }, []);
 
-  // Modal schließen
   const closeModal = useCallback(() => {
     setModalOpen(false);
     setEditingBooking(null);
@@ -136,11 +135,25 @@ function App() {
     setPreselectedDate(undefined);
   }, []);
 
-  // Buchung speichern
+  // Sperr-Modal öffnen (nur für Bearbeiten, Erstellen läuft über BookingModal)
+  const openNewBlock = useCallback(() => {
+    // nicht verwendet — Sperrzeiten werden über BookingModal angelegt
+  }, []);
+
+  const openEditBlock = useCallback((block: Block) => {
+    setEditingBlock(block);
+    setBlockModalOpen(true);
+  }, []);
+
+  const closeBlockModal = useCallback(() => {
+    setBlockModalOpen(false);
+    setEditingBlock(null);
+  }, []);
+
+  // Buchungs-Handler
   const handleSave = useCallback(async (data: BookingInput): Promise<Booking | null> => {
     const result = await createBooking(data);
     if (result) {
-      // Jahr aktualisieren falls nötig
       const checkInYear = new Date(data.check_in).getFullYear();
       if (checkInYear !== year) {
         setYear(checkInYear);
@@ -149,19 +162,32 @@ function App() {
     return result;
   }, [createBooking, year]);
 
-  // Buchung aktualisieren
   const handleUpdate = useCallback(async (id: number, data: BookingInput): Promise<Booking | null> => {
     return await updateBooking(id, data);
   }, [updateBooking]);
 
-  // Buchung löschen
   const handleDelete = useCallback(async (id: number): Promise<boolean> => {
     return await deleteBooking(id);
   }, [deleteBooking]);
 
+  // Block-Handler
+  const handleBlockSave = useCallback(async (input: BlockInput): Promise<Block | null> => {
+    return await createBlock(input);
+  }, [createBlock]);
+
+  const handleBlockUpdate = useCallback(async (id: number, input: BlockInput): Promise<Block | null> => {
+    return await updateBlock(id, input);
+  }, [updateBlock]);
+
+  const handleBlockDelete = useCallback(async (id: number): Promise<boolean> => {
+    return await deleteBlock(id);
+  }, [deleteBlock]);
+
   const modalContext: BookingModalContextType = {
     openNewBooking,
-    openEditBooking
+    openEditBooking,
+    openNewBlock,
+    openEditBlock
   };
 
   return (
@@ -172,6 +198,7 @@ function App() {
             <Dashboard
               houses={houses}
               bookings={bookings}
+              blocks={blocks}
               year={year}
               onYearChange={setYear}
               loading={housesLoading || bookingsLoading}
@@ -179,23 +206,36 @@ function App() {
             />
           } />
           <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/statistics" element={<StatisticsPage />} />
+          <Route path="/statistics" element={<StatisticsPage year={year} onYearChange={setYear} />} />
         </Routes>
       </Layout>
 
-      {/* Buchungsmodal */}
+      {/* Buchungs- und Sperr-Modal (vereint) */}
       <BookingModal
         isOpen={modalOpen}
         booking={editingBooking}
         houses={houses}
         allBookings={bookings}
+        blocks={blocks}
         settings={settings}
         onClose={closeModal}
         onSave={handleSave}
         onUpdate={handleUpdate}
         onDelete={handleDelete}
+        onSaveBlock={handleBlockSave}
         preselectedHouseId={preselectedHouseId}
         preselectedDate={preselectedDate}
+      />
+
+      {/* Sperr-Modal (nur für Bearbeiten bestehender Sperrzeiten via Timeline-Klick) */}
+      <BlockModal
+        isOpen={blockModalOpen}
+        block={editingBlock}
+        houses={houses}
+        onClose={closeBlockModal}
+        onSave={handleBlockSave}
+        onUpdate={handleBlockUpdate}
+        onDelete={handleBlockDelete}
       />
     </BookingModalContext.Provider>
   )

@@ -12,6 +12,7 @@ import housesRouter from './routes/houses.js';
 import bookingsRouter from './routes/bookings.js';
 import settingsRouter from './routes/settings.js';
 import statisticsRouter from './routes/statistics.js';
+import blocksRouter from './routes/blocks.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -47,6 +48,7 @@ function startServer() {
     app.use('/api/bookings', bookingsRouter);
     app.use('/api/settings', settingsRouter);
     app.use('/api/statistics', statisticsRouter);
+    app.use('/api/blocks', blocksRouter);
 
     // Health-Check Endpunkt
     app.get('/api/health', (_req, res) => {

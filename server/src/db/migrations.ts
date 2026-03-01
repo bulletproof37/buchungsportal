@@ -58,6 +58,28 @@ export function runMigrations(): void {
     )
   `);
 
+  // Tabelle: blocks (Gesperrte Zeiträume)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS blocks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      house_id INTEGER NOT NULL,
+      date_from DATE NOT NULL,
+      date_to DATE NOT NULL,
+      description TEXT NOT NULL DEFAULT '',
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (house_id) REFERENCES houses(id)
+    )
+  `);
+
+  // Sortierreihenfolge der Häuser festlegen
+  db.exec(`
+    UPDATE houses SET sort_order = 1 WHERE name = 'Dalarna';
+    UPDATE houses SET sort_order = 2 WHERE name = 'Värmland';
+    UPDATE houses SET sort_order = 3 WHERE name = 'Lönneberga';
+    UPDATE houses SET sort_order = 4 WHERE name = 'Lappland';
+    UPDATE houses SET sort_order = 5 WHERE name = 'Småland';
+  `);
+
   console.log('Datenbank-Migrationen erfolgreich ausgeführt.');
 }
 

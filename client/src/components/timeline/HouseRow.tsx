@@ -1,35 +1,38 @@
 import { useMemo } from 'react';
-import { House, Booking } from '../../types';
+import { House, Booking, Block } from '../../types';
 import { getDaysInYear } from '../../utils/dateUtils';
 import DayCell from './DayCell';
 import BookingBar from './BookingBar';
+import BlockBar from './BlockBar';
 
 interface HouseRowProps {
   house: House;
   year: number;
   bookings: Booking[];
+  blocks: Block[];
   dayWidth: number;
   onDayClick?: (house: House, date: Date) => void;
   onBookingClick?: (booking: Booking) => void;
+  onBlockClick?: (block: Block) => void;
 }
 
 export default function HouseRow({
   house,
   year,
   bookings,
+  blocks,
   dayWidth,
   onDayClick,
-  onBookingClick
+  onBookingClick,
+  onBlockClick
 }: HouseRowProps) {
   const days = useMemo(() => getDaysInYear(year), [year]);
 
   const yearStart = useMemo(() => new Date(year, 0, 1), [year]);
   const yearEnd = useMemo(() => new Date(year, 11, 31, 23, 59, 59), [year]);
 
-  // Filtere Buchungen für dieses Haus
-  const houseBookings = useMemo(() => {
-    return bookings.filter(b => b.house_id === house.id);
-  }, [bookings, house.id]);
+  const houseBookings = useMemo(() => bookings.filter(b => b.house_id === house.id), [bookings, house.id]);
+  const houseBlocks = useMemo(() => blocks.filter(b => b.house_id === house.id), [blocks, house.id]);
 
   const handleDayClick = (date: Date) => {
     onDayClick?.(house, date);
@@ -49,7 +52,19 @@ export default function HouseRow({
           />
         ))}
 
-        {/* Buchungsbalken (absolute positioniert) */}
+        {/* Sperrzeiten (unter Buchungen) */}
+        {houseBlocks.map(block => (
+          <BlockBar
+            key={`block-${block.id}`}
+            block={block}
+            dayWidth={dayWidth}
+            yearStart={yearStart}
+            yearEnd={yearEnd}
+            onClick={onBlockClick}
+          />
+        ))}
+
+        {/* Buchungsbalken */}
         {houseBookings.map(booking => (
           <BookingBar
             key={booking.id}

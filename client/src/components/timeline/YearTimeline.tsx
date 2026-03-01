@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { House, Booking } from '../../types';
+import { House, Booking, Block } from '../../types';
 import { getDaysCountInYear } from '../../utils/dateUtils';
 import MonthHeader from './MonthHeader';
 import HouseRow from './HouseRow';
@@ -8,10 +8,12 @@ import DayNumbers from './DayNumbers';
 interface YearTimelineProps {
   houses: House[];
   bookings: Booking[];
+  blocks: Block[];
   year: number;
   onYearChange: (year: number) => void;
   onDayClick?: (house: House, date: Date) => void;
   onBookingClick?: (booking: Booking) => void;
+  onBlockClick?: (block: Block) => void;
   loading?: boolean;
 }
 
@@ -20,10 +22,12 @@ const DAY_WIDTH = 24; // Breite einer Tageszelle in Pixeln
 export default function YearTimeline({
   houses,
   bookings,
+  blocks,
   year,
   onYearChange,
   onDayClick,
   onBookingClick,
+  onBlockClick,
   loading = false
 }: YearTimelineProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -174,9 +178,11 @@ export default function YearTimeline({
                   house={house}
                   year={year}
                   bookings={bookings}
+                  blocks={blocks}
                   dayWidth={DAY_WIDTH}
                   onDayClick={onDayClick}
                   onBookingClick={onBookingClick}
+                  onBlockClick={onBlockClick}
                 />
               ))}
             </div>
@@ -193,6 +199,10 @@ export default function YearTimeline({
         <div className="flex items-center space-x-2">
           <div className="w-4 h-4 rounded bg-reservation" />
           <span className="text-gray-600">Reservierung</span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <div className="w-4 h-4 rounded bg-block-period" />
+          <span className="text-gray-600">Sperrzeit</span>
         </div>
         <div className="flex items-center space-x-2">
           <div className="w-4 h-4 rounded bg-weekend border border-gray-300" />

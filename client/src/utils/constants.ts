@@ -101,7 +101,8 @@ export const API = {
   HOUSES: '/api/houses',
   BOOKINGS: '/api/bookings',
   SETTINGS: '/api/settings',
-  STATISTICS: '/api/statistics'
+  STATISTICS: '/api/statistics',
+  BLOCKS: '/api/blocks'
 } as const;
 
 // Standard-Werte
