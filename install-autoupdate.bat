@@ -10,7 +10,7 @@ echo   Buchungsportal - Automatisches Update einrichten
 echo  =====================================================
 echo.
 echo  Richtet einen Task ein, der das Portal automatisch
-echo  aktualisiert, sobald der PC hochfährt.
+echo  aktualisiert, sobald der PC hochfahrt.
 echo.
 echo  WICHTIG: Als Administrator ausfuehren!
 echo.
@@ -27,19 +27,15 @@ if %errorlevel% neq 0 (
 :: Log-Verzeichnis anlegen
 if not exist "logs" mkdir logs
 
+:: Pfad in Variable speichern (ohne abschließenden Backslash)
+set APPDIR=%~dp0
+
 echo  Richte geplanten Task ein (beim Systemstart)...
 echo.
 
-:: Geplanten Task erstellen
-:: ONSTART = bei jedem Hochfahren, 90 Sekunden Verzögerung damit Netzwerk bereit ist
-:: Läuft als SYSTEM, auch ohne angemeldeten Benutzer
-schtasks /create ^
-    /tn "Buchungsportal-Autoupdate" ^
-    /tr "cmd /c \"cd /d \"%~dp0\" && update.bat /silent >> \"%~dp0logs\autoupdate.log\" 2>&1\"" ^
-    /sc ONSTART ^
-    /delay 0001:30 ^
-    /ru SYSTEM ^
-    /f
+:: Geplanten Task erstellen - alles auf einer Zeile
+:: ONSTART = bei jedem Hochfahren, 90 Sekunden Verzoegerung fuer Netzwerk
+schtasks /create /tn "Buchungsportal-Autoupdate" /tr "cmd /c \"cd /d \"%APPDIR%\" && update.bat /silent >> \"%APPDIR%logs\autoupdate.log\" 2>&1\"" /sc ONSTART /delay 0001:30 /ru SYSTEM /f
 
 if %errorlevel% neq 0 (
     echo  FEHLER: Geplanter Task konnte nicht erstellt werden!
