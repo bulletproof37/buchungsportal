@@ -97,7 +97,7 @@ export default function BookingModal({
         const house = preselectedHouseId ? houses.find(h => h.id === preselectedHouseId) : null;
         setFormData({
           house_id: preselectedHouseId || undefined,
-          status: initialMode === 'block' ? 'reservation' : initialMode,
+          status: initialMode,
           check_in: preselectedDate ? toISODateString(preselectedDate) : '',
           check_out: '',
           guest_last_name: '',
