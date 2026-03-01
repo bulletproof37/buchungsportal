@@ -24,18 +24,12 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-:: Log-Verzeichnis anlegen
-if not exist "logs" mkdir logs
-
-:: Pfad in Variable speichern (ohne abschließenden Backslash)
-set APPDIR=%~dp0
-
 echo  Richte geplanten Task ein (beim Systemstart)...
 echo.
 
-:: Geplanten Task erstellen - alles auf einer Zeile
+:: Geplanten Task erstellen - ruft run-autoupdate.bat auf (kein komplexes Quoting noetig)
 :: ONSTART = bei jedem Hochfahren, 90 Sekunden Verzoegerung fuer Netzwerk
-schtasks /create /tn "Buchungsportal-Autoupdate" /tr "cmd /c \"cd /d \"%APPDIR%\" && update.bat /silent >> \"%APPDIR%logs\autoupdate.log\" 2>&1\"" /sc ONSTART /delay 0001:30 /ru SYSTEM /f
+schtasks /create /tn "Buchungsportal-Autoupdate" /tr "cmd /c \"%~dp0run-autoupdate.bat\"" /sc ONSTART /delay 0001:30 /ru SYSTEM /f
 
 if %errorlevel% neq 0 (
     echo  FEHLER: Geplanter Task konnte nicht erstellt werden!
