@@ -16,7 +16,20 @@ if %errorlevel% neq 0 (
     echo  FEHLER: Node.js ist nicht installiert!
     echo.
     echo  Bitte installieren: https://nodejs.org
-    echo  Empfohlen: Version 20 LTS
+    echo  Benoetigt: Version 18 oder 20 LTS (nicht 22/24!)
+    echo.
+    pause
+    exit /b 1
+)
+
+:: Node.js Version prüfen (nur Major-Version)
+for /f "tokens=1 delims=." %%V in ('node -e "process.stdout.write(process.version.slice(1))"') do set NODE_MAJOR=%%V
+if %NODE_MAJOR% GTR 21 (
+    echo  FEHLER: Node.js v%NODE_MAJOR% wird nicht unterstuetzt!
+    echo.
+    echo  better-sqlite3 benoetigt Node.js 18 oder 20 LTS.
+    echo  Bitte deinstallieren und neu installieren:
+    echo  https://nodejs.org  ^(LTS-Schaltflaeche anklicken^)
     echo.
     pause
     exit /b 1

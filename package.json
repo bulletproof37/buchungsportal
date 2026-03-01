@@ -21,6 +21,9 @@
   "author": "Bioferienhof Loreley GbR",
   "license": "UNLICENSED",
   "private": true,
+  "engines": {
+    "node": ">=18 <=21"
+  },
   "devDependencies": {
     "concurrently": "^8.2.2"
   },
