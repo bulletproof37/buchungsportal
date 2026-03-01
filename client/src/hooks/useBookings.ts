@@ -47,6 +47,7 @@ export function useBookings(year: number): UseBookingsResult {
     fetchBookings();
   }, [fetchBookings]);
 
+  // Neue Buchung: Refetch nötig, da Server Preis berechnet und ID vergibt
   const createBooking = async (booking: BookingInput): Promise<Booking | null> => {
     try {
       const response = await fetch(API.BOOKINGS, {
@@ -56,12 +57,14 @@ export function useBookings(year: number): UseBookingsResult {
       });
 
       if (!response.ok) {
-        throw new Error(ERRORS.SAVE_ERROR);
+        const data: ApiResponse<Booking> = await response.json();
+        throw new Error(data.error || ERRORS.SAVE_ERROR);
       }
 
       const data: ApiResponse<Booking> = await response.json();
 
       if (data.success && data.data) {
+        // Neue Buchung gehört ggf. zu einem anderen Jahr → immer refetch
         await fetchBookings();
         return data.data;
       } else {
@@ -73,6 +76,7 @@ export function useBookings(year: number): UseBookingsResult {
     }
   };
 
+  // Update: Optimistic Update — lokalen State sofort aktualisieren
   const updateBooking = async (id: number, booking: BookingInput): Promise<Booking | null> => {
     try {
       const response = await fetch(`${API.BOOKINGS}/${id}`, {
@@ -82,14 +86,16 @@ export function useBookings(year: number): UseBookingsResult {
       });
 
       if (!response.ok) {
-        throw new Error(ERRORS.SAVE_ERROR);
+        const data: ApiResponse<Booking> = await response.json();
+        throw new Error(data.error || ERRORS.SAVE_ERROR);
       }
 
       const data: ApiResponse<Booking> = await response.json();
 
       if (data.success && data.data) {
-        await fetchBookings();
-        return data.data;
+        const updated = data.data;
+        setBookings(prev => prev.map(b => (b.id === id ? updated : b)));
+        return updated;
       } else {
         throw new Error(data.error || ERRORS.SAVE_ERROR);
       }
@@ -99,25 +105,26 @@ export function useBookings(year: number): UseBookingsResult {
     }
   };
 
+  // Delete: Optimistic Update — Buchung sofort aus lokalem State entfernen
   const deleteBooking = async (id: number): Promise<boolean> => {
+    // Optimistisch aus State entfernen
+    const previous = bookings;
+    setBookings(prev => prev.filter(b => b.id !== id));
+
     try {
       const response = await fetch(`${API.BOOKINGS}/${id}`, {
         method: 'DELETE'
       });
 
       if (!response.ok) {
+        // Bei Fehler: State wiederherstellen
+        setBookings(previous);
         throw new Error(ERRORS.DELETE_ERROR);
       }
 
-      const data: ApiResponse<null> = await response.json();
-
-      if (data.success) {
-        await fetchBookings();
-        return true;
-      } else {
-        throw new Error(data.error || ERRORS.DELETE_ERROR);
-      }
+      return true;
     } catch (err) {
+      setBookings(previous);
       setError(err instanceof Error ? err.message : ERRORS.DELETE_ERROR);
       return false;
     }

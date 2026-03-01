@@ -1,4 +1,4 @@
-import { queryOne, run, saveDatabase } from './database.js';
+import { queryOne, run } from './database.js';
 
 /**
  * Füllt die Datenbank mit Initialdaten
@@ -59,7 +59,6 @@ export function seedDatabase(): void {
     console.log(`${settings.length} Einstellungen eingefügt.`);
   }
 
-  saveDatabase();
   console.log('Seed-Daten erfolgreich eingefügt.');
 }
 

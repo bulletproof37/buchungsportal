@@ -1,4 +1,4 @@
-import initSqlJs, { Database as SqlJsDatabase } from 'sql.js';
+import Database from 'better-sqlite3';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -10,17 +10,13 @@ const __dirname = path.dirname(__filename);
 const dbPath = path.join(__dirname, '../../data/bookings.db');
 
 // Datenbank-Instanz (Singleton)
-let db: SqlJsDatabase | null = null;
-let SQL: Awaited<ReturnType<typeof initSqlJs>> | null = null;
+let db: Database.Database | null = null;
 
 /**
- * Initialisiert sql.js und lädt/erstellt die Datenbank
+ * Initialisiert better-sqlite3 und lädt/erstellt die Datenbank
  */
-export async function initDatabase(): Promise<SqlJsDatabase> {
+export function initDatabase(): Database.Database {
   if (db) return db;
-
-  // sql.js initialisieren
-  SQL = await initSqlJs();
 
   // Verzeichnis erstellen falls nicht vorhanden
   const dataDir = path.dirname(dbPath);
@@ -28,23 +24,20 @@ export async function initDatabase(): Promise<SqlJsDatabase> {
     fs.mkdirSync(dataDir, { recursive: true });
   }
 
-  // Existierende Datenbank laden oder neue erstellen
-  if (fs.existsSync(dbPath)) {
-    const fileBuffer = fs.readFileSync(dbPath);
-    db = new SQL.Database(fileBuffer);
-    console.log('Bestehende Datenbank geladen:', dbPath);
-  } else {
-    db = new SQL.Database();
-    console.log('Neue Datenbank erstellt');
-  }
+  db = new Database(dbPath);
 
+  // WAL-Modus für bessere Performance und Datensicherheit
+  db.pragma('journal_mode = WAL');
+  db.pragma('foreign_keys = ON');
+
+  console.log('Datenbank geladen:', dbPath);
   return db;
 }
 
 /**
  * Gibt die Datenbank-Instanz zurück (muss vorher initialisiert sein)
  */
-export function getDatabase(): SqlJsDatabase {
+export function getDatabase(): Database.Database {
   if (!db) {
     throw new Error('Datenbank nicht initialisiert. Rufe zuerst initDatabase() auf.');
   }
@@ -52,22 +45,10 @@ export function getDatabase(): SqlJsDatabase {
 }
 
 /**
- * Speichert die Datenbank auf die Festplatte
- */
-export function saveDatabase(): void {
-  if (!db) return;
-
-  const data = db.export();
-  const buffer = Buffer.from(data);
-  fs.writeFileSync(dbPath, buffer);
-}
-
-/**
- * Schließt die Datenbank-Verbindung
+ * Schließt die Datenbank-Verbindung (WAL wird automatisch committed)
  */
 export function closeDatabase(): void {
   if (db) {
-    saveDatabase();
     db.close();
     db = null;
   }
@@ -79,23 +60,16 @@ export function closeDatabase(): void {
 export function queryAll<T>(sql: string, params: unknown[] = []): T[] {
   const database = getDatabase();
   const stmt = database.prepare(sql);
-  stmt.bind(params);
-
-  const results: T[] = [];
-  while (stmt.step()) {
-    const row = stmt.getAsObject();
-    results.push(row as T);
-  }
-  stmt.free();
-  return results;
+  return stmt.all(...params) as T[];
 }
 
 /**
  * Hilfsfunktion: Führt eine SQL-Abfrage aus und gibt das erste Ergebnis zurück
  */
 export function queryOne<T>(sql: string, params: unknown[] = []): T | undefined {
-  const results = queryAll<T>(sql, params);
-  return results[0];
+  const database = getDatabase();
+  const stmt = database.prepare(sql);
+  return stmt.get(...params) as T | undefined;
 }
 
 /**
@@ -103,18 +77,11 @@ export function queryOne<T>(sql: string, params: unknown[] = []): T | undefined 
  */
 export function run(sql: string, params: unknown[] = []): { changes: number; lastInsertRowid: number } {
   const database = getDatabase();
-  database.run(sql, params);
-
-  // Änderungen und letzte ID abrufen
-  const changesResult = queryOne<{ changes: number }>('SELECT changes() as changes');
-  const lastIdResult = queryOne<{ id: number }>('SELECT last_insert_rowid() as id');
-
-  // Nach Änderungen automatisch speichern
-  saveDatabase();
-
+  const stmt = database.prepare(sql);
+  const result = stmt.run(...params);
   return {
-    changes: changesResult?.changes ?? 0,
-    lastInsertRowid: lastIdResult?.id ?? 0
+    changes: result.changes,
+    lastInsertRowid: Number(result.lastInsertRowid)
   };
 }
 

@@ -1,4 +1,4 @@
-import { getDatabase, saveDatabase } from './database.js';
+import { getDatabase } from './database.js';
 
 /**
  * Führt alle Datenbank-Migrationen aus
@@ -7,7 +7,7 @@ export function runMigrations(): void {
   const db = getDatabase();
 
   // Tabelle: houses (Ferienhäuser)
-  db.run(`
+  db.exec(`
     CREATE TABLE IF NOT EXISTS houses (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -17,7 +17,7 @@ export function runMigrations(): void {
   `);
 
   // Tabelle: bookings (Buchungen)
-  db.run(`
+  db.exec(`
     CREATE TABLE IF NOT EXISTS bookings (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       house_id INTEGER NOT NULL,
@@ -45,20 +45,19 @@ export function runMigrations(): void {
   `);
 
   // Index für schnelle Abfragen nach Jahr/Haus
-  db.run(`
+  db.exec(`
     CREATE INDEX IF NOT EXISTS idx_bookings_house_dates
     ON bookings(house_id, check_in, check_out)
   `);
 
   // Tabelle: settings (Einstellungen)
-  db.run(`
+  db.exec(`
     CREATE TABLE IF NOT EXISTS settings (
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL
     )
   `);
 
-  saveDatabase();
   console.log('Datenbank-Migrationen erfolgreich ausgeführt.');
 }
 

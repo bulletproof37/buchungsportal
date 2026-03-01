@@ -72,17 +72,17 @@ function calculateNights(checkIn: string, checkOut: string): number {
 }
 
 /**
- * Lädt die Standard-Einstellungen
+ * Lädt alle relevanten Einstellungen in einem einzigen SQL-Query
  */
 function getSettings(): { surcharge: number; dogPrice: number; minNights: number } {
-  const surchargeRow = queryOne<{ value: string }>("SELECT value FROM settings WHERE key = 'surcharge_first_night'");
-  const dogPriceRow = queryOne<{ value: string }>("SELECT value FROM settings WHERE key = 'price_per_dog_night'");
-  const minNightsRow = queryOne<{ value: string }>("SELECT value FROM settings WHERE key = 'min_nights'");
-
+  const rows = queryAll<{ key: string; value: string }>(
+    "SELECT key, value FROM settings WHERE key IN ('surcharge_first_night', 'price_per_dog_night', 'min_nights')"
+  );
+  const map = Object.fromEntries(rows.map(r => [r.key, r.value]));
   return {
-    surcharge: surchargeRow ? parseFloat(surchargeRow.value) : 35,
-    dogPrice: dogPriceRow ? parseFloat(dogPriceRow.value) : 5,
-    minNights: minNightsRow ? parseInt(minNightsRow.value) : 2
+    surcharge: parseFloat(map['surcharge_first_night'] ?? '35'),
+    dogPrice: parseFloat(map['price_per_dog_night'] ?? '5'),
+    minNights: parseInt(map['min_nights'] ?? '2'),
   };
 }
 

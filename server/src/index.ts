@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import { initDatabase } from './db/database.js';
 import { runMigrations } from './db/migrations.js';
 import { seedDatabase } from './db/seed.js';
+import { startAutoBackup } from './services/backup.js';
 import housesRouter from './routes/houses.js';
 import bookingsRouter from './routes/bookings.js';
 import settingsRouter from './routes/settings.js';
@@ -18,18 +19,28 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
-app.use(cors());
+// CORS: nur lokale Ursprünge erlauben
+app.use(cors({
+  origin: [
+    `http://localhost:5173`,  // Vite dev server
+    `http://localhost:${PORT}`,
+    `http://127.0.0.1:5173`,
+    `http://127.0.0.1:${PORT}`,
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type'],
+}));
+
 app.use(express.json());
 
 // Server starten
-async function startServer() {
+function startServer() {
   try {
-    // Datenbank initialisieren (asynchron für sql.js)
     console.log('Initialisiere Datenbank...');
-    await initDatabase();
+    initDatabase();
     runMigrations();
     seedDatabase();
+    startAutoBackup();
 
     // API-Routen
     app.use('/api/houses', housesRouter);
