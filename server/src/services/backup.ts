@@ -1,4 +1,5 @@
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { getDatabase } from '../db/database.js';
@@ -9,8 +10,12 @@ const __dirname = path.dirname(__filename);
 const backupDir = path.join(__dirname, '../../../data/backups');
 const MAX_BACKUPS = 14; // 14 Tage aufbewahren
 
+// Externes Backup-Verzeichnis (Dokumente des aktuellen Benutzers)
+const externalBackupDir = path.join(os.homedir(), 'Documents', 'Buchungsportal-Backup');
+const MAX_EXTERNAL_BACKUPS = 30; // 30 externe Kopien aufbewahren
+
 /**
- * Erstellt ein Backup der Datenbank
+ * Erstellt ein Backup der Datenbank (lokal + extern)
  */
 export function createBackup(): void {
   try {
@@ -25,31 +30,55 @@ export function createBackup(): void {
 
     // better-sqlite3 hat eine eingebaute backup()-Methode
     db.backup(backupPath)
-      .then(() => console.log(`Backup erstellt: ${backupPath}`))
+      .then(() => {
+        console.log(`Backup erstellt: ${backupPath}`);
+        // Nach erfolgreichem lokalem Backup: externe Kopie anlegen
+        copyToExternalBackup(backupPath, timestamp);
+      })
       .catch((err: Error) => console.error('Backup fehlgeschlagen:', err));
 
-    // Alte Backups aufräumen
-    cleanOldBackups();
+    // Alte lokale Backups aufräumen
+    cleanOldBackups(backupDir, 'bookings_', MAX_BACKUPS);
   } catch (error) {
     console.error('Fehler beim Erstellen des Backups:', error);
   }
 }
 
 /**
- * Löscht Backups die älter als MAX_BACKUPS Tage sind
+ * Kopiert ein fertiges Backup in das externe Verzeichnis (Dokumente)
  */
-function cleanOldBackups(): void {
+function copyToExternalBackup(sourcePath: string, timestamp: string): void {
   try {
-    if (!fs.existsSync(backupDir)) return;
+    if (!fs.existsSync(externalBackupDir)) {
+      fs.mkdirSync(externalBackupDir, { recursive: true });
+    }
 
-    const files = fs.readdirSync(backupDir)
-      .filter(f => f.startsWith('bookings_') && f.endsWith('.db'))
+    const destPath = path.join(externalBackupDir, `bookings_${timestamp}.db`);
+    fs.copyFileSync(sourcePath, destPath);
+    console.log(`Externes Backup: ${destPath}`);
+
+    cleanOldBackups(externalBackupDir, 'bookings_', MAX_EXTERNAL_BACKUPS);
+  } catch (error) {
+    // Externes Backup ist optional — Fehler nur loggen, nicht werfen
+    console.warn('Externes Backup fehlgeschlagen (nicht kritisch):', error);
+  }
+}
+
+/**
+ * Löscht älteste Backups wenn Maximum überschritten
+ */
+function cleanOldBackups(dir: string, prefix: string, maxCount: number): void {
+  try {
+    if (!fs.existsSync(dir)) return;
+
+    const files = fs.readdirSync(dir)
+      .filter(f => f.startsWith(prefix) && f.endsWith('.db'))
       .sort()
       .reverse(); // neueste zuerst
 
-    const toDelete = files.slice(MAX_BACKUPS);
+    const toDelete = files.slice(maxCount);
     for (const file of toDelete) {
-      fs.unlinkSync(path.join(backupDir, file));
+      fs.unlinkSync(path.join(dir, file));
       console.log(`Altes Backup gelöscht: ${file}`);
     }
   } catch (error) {
@@ -76,7 +105,6 @@ export function startAutoBackup(): void {
 
   setTimeout(() => {
     createBackup();
-    // Danach alle 24h wiederholen
     setInterval(createBackup, 24 * 60 * 60 * 1000);
   }, msUntilFirst);
 

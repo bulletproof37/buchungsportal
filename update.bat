@@ -18,6 +18,26 @@ echo  [%date% %time%] Update gestartet.
 
 cd /d "%~dp0"
 
+:: -------------------------------------------------------
+:: Datenbank sichern (BEVOR irgend etwas geändert wird)
+:: -------------------------------------------------------
+if exist "server\data\bookings.db" (
+    if not exist "server\data\backups" mkdir "server\data\backups"
+
+    :: Zeitstempel für Backup-Dateiname
+    for /f %%I in ('powershell -command "Get-Date -Format yyyyMMdd_HHmmss"') do set TIMESTAMP=%%I
+    set BACKUP_FILE=server\data\backups\bookings_pre-update_%TIMESTAMP%.db
+    copy "server\data\bookings.db" "%BACKUP_FILE%" >nul
+    echo  Datenbank gesichert: %BACKUP_FILE%
+
+    :: Auch in Dokumente sichern (externe Kopie)
+    if not exist "%USERPROFILE%\Documents\Buchungsportal-Backup" (
+        mkdir "%USERPROFILE%\Documents\Buchungsportal-Backup"
+    )
+    copy "server\data\bookings.db" "%USERPROFILE%\Documents\Buchungsportal-Backup\bookings_pre-update_%TIMESTAMP%.db" >nul
+    echo  Externe Kopie: Dokumente\Buchungsportal-Backup\
+)
+
 :: Git prüfen
 where git >nul 2>nul
 if %errorlevel% neq 0 (
