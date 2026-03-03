@@ -89,7 +89,7 @@ export default function YearTimeline({
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col">
       {/* Jahresumschalter */}
       <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
         <div className="flex items-center space-x-4">
@@ -138,8 +138,8 @@ export default function YearTimeline({
       )}
 
       {/* Zeitstrahl Container */}
-      <div className="flex-1 overflow-hidden">
-        <div className="flex h-full">
+      <div className="overflow-hidden">
+        <div className="flex">
           {/* Hausnamen-Spalte (sticky) */}
           <div className="w-28 min-w-28 flex-shrink-0 bg-white border-r border-gray-300 z-20">
             {/* Platzhalter für Monatsheader */}

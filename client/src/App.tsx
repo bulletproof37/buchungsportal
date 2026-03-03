@@ -69,7 +69,7 @@ function Dashboard({ houses, bookings, blocks, year, onYearChange, loading, erro
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)]">
-      <div className="flex-1 min-h-0">
+      <div>
         <YearTimeline
           houses={houses}
           bookings={bookings}
