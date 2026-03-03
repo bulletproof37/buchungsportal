@@ -36,6 +36,9 @@ export default function YearTimeline({
   const daysInYear = useMemo(() => getDaysCountInYear(year), [year]);
   const totalWidth = daysInYear * DAY_WIDTH;
 
+  // Exakte Pixelhöhe: h-8 (32px) + h-6 (24px) + n × h-10 (40px)
+  const rowsHeight = 32 + 24 + houses.length * 40;
+
   // Scroll zu heute beim ersten Laden
   useEffect(() => {
     if (scrollContainerRef.current && !scrolledToToday) {
@@ -138,8 +141,8 @@ export default function YearTimeline({
       )}
 
       {/* Zeitstrahl Container */}
-      <div className="overflow-hidden">
-        <div className="flex">
+      <div style={{ height: rowsHeight }}>
+        <div className="flex h-full">
           {/* Hausnamen-Spalte (sticky) */}
           <div className="w-28 min-w-28 flex-shrink-0 bg-white border-r border-gray-300 z-20">
             {/* Platzhalter für Monatsheader */}
