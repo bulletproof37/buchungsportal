@@ -36,8 +36,8 @@ export default function YearTimeline({
   const daysInYear = useMemo(() => getDaysCountInYear(year), [year]);
   const totalWidth = daysInYear * DAY_WIDTH;
 
-  // Exakte Pixelhöhe: h-8 (32px) + h-6 (24px) + n × h-10 (40px)
-  const rowsHeight = 32 + 24 + houses.length * 40;
+  // Exakte Pixelhöhe: h-8 (32px) + h-6 (24px) + n × h-10 (40px) + 20px Scrollbar
+  const rowsHeight = 32 + 24 + houses.length * 40 + 20;
 
   // Scroll zu heute beim ersten Laden
   useEffect(() => {

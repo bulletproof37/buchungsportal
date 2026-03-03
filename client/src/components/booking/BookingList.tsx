@@ -89,7 +89,7 @@ export default function BookingList({ bookings, houses, onBookingClick }: Bookin
   const tdClass = 'px-3 py-1 text-sm text-gray-700 whitespace-nowrap';
 
   return (
-    <div className="border-t border-gray-300 bg-white flex flex-col" style={{ height: '148px' }}>
+    <div className="border-t border-gray-300 bg-white flex flex-col h-full">
       <div className="px-4 py-1.5 bg-gray-50 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
         <span className="text-sm font-semibold text-gray-700">
           Buchungen ({bookings.length})

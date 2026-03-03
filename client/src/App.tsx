@@ -82,11 +82,13 @@ function Dashboard({ houses, bookings, blocks, year, onYearChange, loading, erro
           loading={loading}
         />
       </div>
-      <BookingList
-        bookings={bookings}
-        houses={houses}
-        onBookingClick={handleBookingClick}
-      />
+      <div className="flex-1 min-h-0">
+        <BookingList
+          bookings={bookings}
+          houses={houses}
+          onBookingClick={handleBookingClick}
+        />
+      </div>
     </div>
   );
 }
