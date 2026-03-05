@@ -61,6 +61,8 @@ export default function BookingModal({
   const [errors, setErrors] = useState<ValidationError[]>([]);
   const [saving, setSaving] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [anzahlungErhalten, setAnzahlungErhalten] = useState(false);
+  const [gesamtbetragErhalten, setGesamtbetragErhalten] = useState(false);
 
   // Block-spezifische Felder
   const [blockDateFrom, setBlockDateFrom] = useState('');
@@ -120,6 +122,8 @@ export default function BookingModal({
       setErrors([]);
       setBlockErrors([]);
       setShowDeleteConfirm(false);
+      setAnzahlungErhalten(false);
+      setGesamtbetragErhalten(false);
     }
   }, [isOpen, booking, preselectedHouseId, preselectedDate, preselectedStatus, houses]);
 
@@ -396,7 +400,7 @@ export default function BookingModal({
                   disabled={saving}
                 />
               </div>
-              <div className="lg:col-span-1">
+              <div className="lg:col-span-1 space-y-3">
                 <PriceCalculation
                   checkIn={formData.check_in}
                   checkOut={formData.check_out}
@@ -405,6 +409,29 @@ export default function BookingModal({
                   surchargeFirstNight={settings.surcharge_first_night}
                   pricePerDogNight={settings.price_per_dog_night}
                 />
+                {/* Zahlungsstatus */}
+                <div className="space-y-2 pt-2 border-t border-gray-200">
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={anzahlungErhalten}
+                      onChange={(e) => setAnzahlungErhalten(e.target.checked)}
+                      disabled={saving}
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-400"
+                    />
+                    <span className="text-sm text-gray-700">Anzahlung erhalten</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={gesamtbetragErhalten}
+                      onChange={(e) => setGesamtbetragErhalten(e.target.checked)}
+                      disabled={saving}
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-400"
+                    />
+                    <span className="text-sm text-gray-700">Gesamtbetrag erhalten</span>
+                  </label>
+                </div>
               </div>
             </div>
           )}

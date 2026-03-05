@@ -4,6 +4,7 @@ import { getDaysCountInYear } from '../../utils/dateUtils';
 import MonthHeader from './MonthHeader';
 import HouseRow from './HouseRow';
 import DayNumbers from './DayNumbers';
+import WeekdayRow from './WeekdayRow';
 
 interface YearTimelineProps {
   houses: House[];
@@ -36,8 +37,8 @@ export default function YearTimeline({
   const daysInYear = useMemo(() => getDaysCountInYear(year), [year]);
   const totalWidth = daysInYear * DAY_WIDTH;
 
-  // Exakte Pixelhöhe: h-8 (32px) + h-6 (24px) + n × h-10 (40px) + 20px Scrollbar
-  const rowsHeight = 32 + 24 + houses.length * 40 + 20;
+  // Exakte Pixelhöhe: h-8 (32px) + h-5 (20px) Wochentage + h-6 (24px) + n × h-10 (40px) + 20px Scrollbar
+  const rowsHeight = 32 + 20 + 24 + houses.length * 40 + 20;
 
   // Scroll zu heute beim ersten Laden
   useEffect(() => {
@@ -147,6 +148,8 @@ export default function YearTimeline({
           <div className="w-28 min-w-28 flex-shrink-0 bg-white border-r border-gray-300 z-20">
             {/* Platzhalter für Monatsheader */}
             <div className="h-8 border-b border-gray-300 bg-gray-50" />
+            {/* Platzhalter für Wochentage */}
+            <div className="h-5 border-b border-gray-200 bg-gray-50" />
             {/* Platzhalter für Tagesnummern */}
             <div className="h-6 border-b border-gray-200 bg-gray-50" />
             {/* Hausnamen */}
@@ -170,6 +173,9 @@ export default function YearTimeline({
             <div style={{ width: totalWidth, minWidth: totalWidth }}>
               {/* Monatsheader */}
               <MonthHeader year={year} dayWidth={DAY_WIDTH} />
+
+              {/* Wochentage */}
+              <WeekdayRow year={year} dayWidth={DAY_WIDTH} />
 
               {/* Tagesnummern */}
               <DayNumbers year={year} dayWidth={DAY_WIDTH} />

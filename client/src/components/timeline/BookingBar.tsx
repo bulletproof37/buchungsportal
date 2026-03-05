@@ -60,7 +60,7 @@ export default function BookingBar({
 
   return (
     <div
-      className={`absolute top-1 bottom-1 ${bgColor} rounded text-white text-xs font-medium px-1 truncate flex items-center cursor-pointer transition-colors shadow-sm`}
+      className={`absolute top-1 bottom-1 ${bgColor} rounded text-white text-xs font-medium px-1 truncate flex items-center cursor-pointer transition-colors shadow-sm border border-black/20`}
       style={{
         left: leftOffset,
         width: Math.max(width, 20)

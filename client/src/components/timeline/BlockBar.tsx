@@ -27,7 +27,7 @@ export default function BlockBar({ block, dayWidth, yearStart, yearEnd, onClick 
 
   return (
     <div
-      className="absolute top-1 bottom-1 bg-block-period hover:bg-block-period-dark rounded text-gray-700 text-xs font-medium px-1 truncate flex items-center cursor-pointer transition-colors shadow-sm opacity-90"
+      className="absolute top-1 bottom-1 bg-block-period hover:bg-block-period-dark rounded text-gray-700 text-xs font-medium px-1 truncate flex items-center cursor-pointer transition-colors shadow-sm opacity-90 border border-black/20"
       style={{ left: leftOffset, width: Math.max(width, 20) }}
       onClick={() => onClick?.(block)}
       title={block.description || 'Gesperrt'}
