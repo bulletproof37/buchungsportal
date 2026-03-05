@@ -48,7 +48,7 @@ export default function YearTimeline({
         const dayOfYear = Math.floor(
           (today.getTime() - new Date(year, 0, 1).getTime()) / (1000 * 60 * 60 * 24)
         );
-        const scrollPosition = dayOfYear * DAY_WIDTH - scrollContainerRef.current.clientWidth / 3;
+        const scrollPosition = dayOfYear * DAY_WIDTH - scrollContainerRef.current.clientWidth / 4;
         scrollContainerRef.current.scrollLeft = Math.max(0, scrollPosition);
         setScrolledToToday(true);
       }
@@ -82,7 +82,7 @@ export default function YearTimeline({
           const dayOfYear = Math.floor(
             (today.getTime() - new Date(currentYear, 0, 1).getTime()) / (1000 * 60 * 60 * 24)
           );
-          const scrollPosition = dayOfYear * DAY_WIDTH - scrollContainerRef.current.clientWidth / 3;
+          const scrollPosition = dayOfYear * DAY_WIDTH - scrollContainerRef.current.clientWidth / 4;
           scrollContainerRef.current.scrollTo({
             left: Math.max(0, scrollPosition),
             behavior: 'smooth'
