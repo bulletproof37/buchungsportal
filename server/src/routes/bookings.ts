@@ -183,9 +183,6 @@ function drawTimelinePage(
   const x0 = mg;
   let y = mg;
 
-  const fmtCur = (n: number) =>
-    new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(n);
-
   // ── Seitenkopf ────────────────────────────────────────────
   const monthLabel = pageMonths.map(m => MONTH_NAMES_DE[m - 1]).join(' & ');
   doc.fontSize(10).font('Helvetica-Bold').fillColor('#000000')
@@ -337,13 +334,12 @@ function drawTimelinePage(
 
   // Tabellenspalten
   const c = {
-    h: { x: x0, w: 95 },
-    g: { x: x0 + 95, w: 125 },
-    i: { x: x0 + 220, w: 72 },
-    o: { x: x0 + 292, w: 72 },
-    n: { x: x0 + 364, w: 45 },
-    s: { x: x0 + 409, w: 82 },
-    p: { x: x0 + 491, w: pageW - 491 },
+    h: { x: x0, w: 110 },
+    g: { x: x0 + 110, w: 160 },
+    i: { x: x0 + 270, w: 80 },
+    o: { x: x0 + 350, w: 80 },
+    n: { x: x0 + 430, w: 50 },
+    s: { x: x0 + 480, w: pageW - 480 },
   };
 
   doc.rect(x0, y, pageW, 13).fill('#dde3ee');
@@ -354,7 +350,6 @@ function drawTimelinePage(
   doc.text('Abreise', c.o.x + 2, y + 3, { width: c.o.w, lineBreak: false });
   doc.text('Nächte', c.n.x + 2, y + 3, { width: c.n.w, lineBreak: false });
   doc.text('Status', c.s.x + 2, y + 3, { width: c.s.w, lineBreak: false });
-  doc.text('Gesamtpreis', c.p.x + 2, y + 3, { width: c.p.w, align: 'right', lineBreak: false });
   y += 13;
 
   if (relevant.length === 0) {
@@ -376,8 +371,6 @@ function drawTimelinePage(
       doc.text(String(nights), c.n.x + 2, y + 3, { width: c.n.w - 4, lineBreak: false });
       doc.fillColor(isBook ? '#1d4ed8' : '#92400e')
         .text(isBook ? 'Buchung' : 'Reservierung', c.s.x + 2, y + 3, { width: c.s.w - 4, lineBreak: false });
-      doc.fillColor('#111111')
-        .text(fmtCur(b.total_price), c.p.x + 2, y + 3, { width: c.p.w - 4, align: 'right', lineBreak: false });
       y += 12;
       doc.moveTo(x0, y).lineTo(x0 + pageW, y).strokeColor('#e5e7eb').lineWidth(0.3).stroke();
     });
