@@ -5,6 +5,7 @@ import MonthHeader from './MonthHeader';
 import HouseRow from './HouseRow';
 import DayNumbers from './DayNumbers';
 import WeekdayRow from './WeekdayRow';
+import TimelinePdfModal from './TimelinePdfModal';
 
 interface YearTimelineProps {
   houses: House[];
@@ -33,6 +34,7 @@ export default function YearTimeline({
 }: YearTimelineProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [scrolledToToday, setScrolledToToday] = useState(false);
+  const [showPdfModal, setShowPdfModal] = useState(false);
 
   const daysInYear = useMemo(() => getDaysCountInYear(year), [year]);
   const totalWidth = daysInYear * DAY_WIDTH;
@@ -93,6 +95,7 @@ export default function YearTimeline({
   };
 
   return (
+    <>
     <div className="flex flex-col">
       {/* Jahresumschalter */}
       <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
@@ -127,6 +130,18 @@ export default function YearTimeline({
           className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
         >
           Heute
+        </button>
+
+        <button
+          onClick={() => setShowPdfModal(true)}
+          className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-md transition-colors flex items-center gap-1"
+          title="Monats-Timeline als PDF exportieren"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          PDF
         </button>
       </div>
 
@@ -219,5 +234,10 @@ export default function YearTimeline({
         </div>
       </div>
     </div>
+
+    {showPdfModal && (
+      <TimelinePdfModal year={year} onClose={() => setShowPdfModal(false)} />
+    )}
+    </>
   );
 }
