@@ -44,6 +44,10 @@ export function runMigrations(): void {
     )
   `);
 
+  // Neue Spalten für Zahlungsstatus (idempotent, try/catch falls schon vorhanden)
+  try { db.exec(`ALTER TABLE bookings ADD COLUMN deposit_received INTEGER NOT NULL DEFAULT 0`); } catch {}
+  try { db.exec(`ALTER TABLE bookings ADD COLUMN payment_received INTEGER NOT NULL DEFAULT 0`); } catch {}
+
   // Index für schnelle Abfragen nach Jahr/Haus
   db.exec(`
     CREATE INDEX IF NOT EXISTS idx_bookings_house_dates

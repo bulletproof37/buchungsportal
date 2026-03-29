@@ -30,6 +30,8 @@ export interface Booking {
   price_per_dog_night: number;
   total_price: number;
   notes?: string;
+  deposit_received: boolean;
+  payment_received: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -51,6 +53,8 @@ export interface BookingInput {
   dog_count: number;
   price_per_night: number;
   notes?: string;
+  deposit_received?: boolean;
+  payment_received?: boolean;
 }
 
 // Einstellungen

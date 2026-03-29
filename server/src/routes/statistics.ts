@@ -41,10 +41,11 @@ router.get('/', (req, res) => {
     // Alle Häuser laden
     const houses = queryAll<{ id: number; name: string }>('SELECT id, name FROM houses ORDER BY sort_order');
 
-    // Anzahl Tage im Zeitraum berechnen
+    // Branchenübliche Vollbelegung für Ferienhäuser: 100 Tage/Jahr
+    const ANNUAL_CAPACITY_DAYS = 100;
+
     const fromDate = new Date(from);
     const toDate = new Date(to);
-    const totalDays = Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
     const houseStats: HouseStats[] = [];
     let totalOvernightStays = 0;
@@ -92,7 +93,7 @@ router.get('/', (req, res) => {
       }
 
       const occupiedDays = occupiedDates.size;
-      const occupancyRate = totalDays > 0 ? (occupiedDays / totalDays) * 100 : 0;
+      const occupancyRate = (occupiedDays / ANNUAL_CAPACITY_DAYS) * 100;
 
       houseStats.push({
         house_id: house.id,

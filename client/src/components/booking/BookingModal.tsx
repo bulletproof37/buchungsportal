@@ -122,8 +122,8 @@ export default function BookingModal({
       setErrors([]);
       setBlockErrors([]);
       setShowDeleteConfirm(false);
-      setAnzahlungErhalten(false);
-      setGesamtbetragErhalten(false);
+      setAnzahlungErhalten(booking?.deposit_received ?? false);
+      setGesamtbetragErhalten(booking?.payment_received ?? false);
     }
   }, [isOpen, booking, preselectedHouseId, preselectedDate, preselectedStatus, houses]);
 
@@ -204,7 +204,9 @@ export default function BookingModal({
       guest_count: formData.guest_count || undefined,
       dog_count: formData.dog_count || 0,
       price_per_night: formData.price_per_night!,
-      notes: formData.notes?.trim() || undefined
+      notes: formData.notes?.trim() || undefined,
+      deposit_received: anzahlungErhalten,
+      payment_received: gesamtbetragErhalten
     };
 
     setSaving(true);

@@ -20,6 +20,8 @@ interface BookingInput {
   dog_count: number;
   price_per_night: number;
   notes?: string;
+  deposit_received?: boolean;
+  payment_received?: boolean;
 }
 
 interface BookingRow {
@@ -43,6 +45,8 @@ interface BookingRow {
   price_per_dog_night: number;
   total_price: number;
   notes: string | null;
+  deposit_received: number;
+  payment_received: number;
   created_at: string;
   updated_at: string;
 }
@@ -396,7 +400,7 @@ router.get('/timeline-pdf', (req, res) => {
     }
 
     const yearStr = String(year);
-    const houses = queryAll<{ id: number; name: string }>('SELECT id, name FROM houses ORDER BY id');
+    const houses = queryAll<{ id: number; name: string }>('SELECT id, name FROM houses ORDER BY sort_order');
     const bookings = queryAll<BookingRow>(`
       SELECT b.*, h.name as house_name
       FROM bookings b
@@ -728,8 +732,8 @@ router.post('/', (req, res) => {
         guest_last_name, guest_first_name, guest_email, guest_phone,
         guest_street, guest_zip, guest_city, guest_count,
         dog_count, price_per_night, surcharge_first_night, price_per_dog_night,
-        total_price, notes
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        total_price, notes, deposit_received, payment_received
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
       input.house_id,
       input.status,
@@ -748,7 +752,9 @@ router.post('/', (req, res) => {
       settings.surcharge,
       settings.dogPrice,
       totalPrice,
-      input.notes || null
+      input.notes || null,
+      input.deposit_received ? 1 : 0,
+      input.payment_received ? 1 : 0
     ]);
 
     // Erstellte Buchung laden
@@ -845,6 +851,8 @@ router.put('/:id', (req, res) => {
         price_per_night = ?,
         total_price = ?,
         notes = ?,
+        deposit_received = ?,
+        payment_received = ?,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `, [
@@ -864,6 +872,8 @@ router.put('/:id', (req, res) => {
       input.price_per_night,
       totalPrice,
       input.notes || null,
+      input.deposit_received ? 1 : 0,
+      input.payment_received ? 1 : 0,
       bookingId
     ]);
 
